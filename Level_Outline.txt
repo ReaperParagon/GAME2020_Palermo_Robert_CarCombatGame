@@ -1,0 +1,60 @@
+Level Outline - GAME2020_M1_Palermo_Robert_CarCombatGame
+---------------------------------------------------------------------------------------
+Opening:
+Double click GAME2020_CarCombat.uproject to open project with Unreal Engine
+---------------------------------------------------------------------------------------
+Turrets:
+In the World Outliner you can find the 10 Turret models under 
+Arena (Editor) -> Arena_1 -> Turrets
+Each Turret is named "Mesh_Turret_x", where x is the turret number.
+
+General Placement:
+There is one turret in each corner of the arena, and there are three around each archway.
+---------------------------------------------------------------------------------------
+Hazards:
+There are three different types of hazards: Bumpers, Hammers and a Pit all found under
+Arena (Editor) -> Arena_1 -> Hazards
+
+Bumpers:
+... -> Hazards -> Bumpers
+Bumpers are named "Bumper_1" and "Bumper_2".
+The Bumpers are intended to follow a path and bounce the vehicle away if they touch it.
+Bumpers are placed moving about near the ramps.
+
+Hammers:
+... -> Hazards -> Hammers
+Hammers are named "Hammer_1" and "Hammer_2"
+The Hammers are intended to hit the vehicle, doing damage to the player and sending them flying.
+They are placed on top of each archway.
+
+Pit:
+... -> Hazards
+Pit is named "Mesh_Pit"
+The Pit is intended to destroy the player if they fall into it.
+Pit is placed in the center of the arena, between the ramps.
+---------------------------------------------------------------------------------------
+Other:
+There are some other folders containing the Arena's floor, walls, ramps, obstacles and archways.
+
+Floors and Walls:
+Arena (Editor) -> Arena_1 -> Arena_Area
+Floor is named "Arena_Floor".
+Walls are named "Arena_Wall_x" where x is the wall number.
+Arena_Wall_1 also includes the small starting area for the player vehicle.
+
+Obstacles:
+Arena (Editor) -> Arena_1 -> Obstacles
+Obstacles are named "Mesh_Obstacle_x" where x is the obstacle number.
+The Obstacles are large rectangular pillars.
+
+Ramps and Archways:
+Arena (Editor) -> Arena_1 -> Ramps_Archways
+Ramps are named "Mesh_Ramp_1" and "Mesh_Ramp_2".
+Archways are named "Mesh_Archway_1" and "Mesh_Archway_2".
+Ramps let the player jump over the Pit, and the player can drive the vehicle over or under 
+the archways.
+---------------------------------------------------------------------------------------
+Materials:
+The Turrets and Hazards should have a grid material named "WorldGridMaterial"
+while the floor, walls, obstacles, ramps and archways use a material named "BasicShapeMaterial".
+These are to easily identify the turrets and hazards from the arena base.
