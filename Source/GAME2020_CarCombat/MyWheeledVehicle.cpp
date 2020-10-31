@@ -52,6 +52,9 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("ChaseCamera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	Camera->FieldOfView = 90.0f;
+
+	// Health
+	Health = 100.0f;
 }
 
 void AMyWheeledVehicle::Tick(float DeltaTime)

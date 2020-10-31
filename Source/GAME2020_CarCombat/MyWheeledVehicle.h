@@ -13,7 +13,10 @@ UCLASS()
 class GAME2020_CARCOMBAT_API AMyWheeledVehicle : public AWheeledVehicle
 {
 	GENERATED_BODY()
-
+public:
+	/** Health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float Health;
 public:
 
 	AMyWheeledVehicle();
@@ -36,6 +39,10 @@ public:
 
 	/** Update in air Physics */
 	void UpdateInAirControl(float DeltaTime);
+
+	/** Set Health Value */
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void IncrementHealth(float inc);
 
 protected:
 
