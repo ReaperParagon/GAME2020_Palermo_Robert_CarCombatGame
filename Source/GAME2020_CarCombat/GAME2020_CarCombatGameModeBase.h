@@ -14,4 +14,6 @@ class GAME2020_CARCOMBAT_API AGAME2020_CarCombatGameModeBase : public AGameModeB
 {
 	GENERATED_BODY()
 	
+public:
+	AGAME2020_CarCombatGameModeBase();
 };

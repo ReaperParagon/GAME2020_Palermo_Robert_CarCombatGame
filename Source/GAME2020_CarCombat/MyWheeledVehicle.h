@@ -14,10 +14,6 @@ class GAME2020_CARCOMBAT_API AMyWheeledVehicle : public AWheeledVehicle
 {
 	GENERATED_BODY()
 public:
-	/** Health */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	float Health;
-public:
 
 	AMyWheeledVehicle();
 
@@ -40,9 +36,13 @@ public:
 	/** Update in air Physics */
 	void UpdateInAirControl(float DeltaTime);
 
-	/** Set Health Value */
-	UFUNCTION(BlueprintCallable, Category = "Player")
-	void IncrementHealth(float inc);
+	/** Health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float PlayerHealth;
+
+	/** Max Health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float PlayerHealthMax;
 
 protected:
 
@@ -53,4 +53,8 @@ protected:
 	/** Camera component that will be our viewpoint */
 	UPROPERTY(Category = Camera, EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* Camera;
+
+	/** Set Health Value */
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void IncrementHealth(float inc);
 };

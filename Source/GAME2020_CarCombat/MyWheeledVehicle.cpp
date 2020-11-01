@@ -22,17 +22,19 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 	Vehicle4W->MaxNormalizedTireLoadFiltered = 2.0f;
 
 	// Torque setup
-	Vehicle4W->MaxEngineRPM = 5700.0f;
+	Vehicle4W->MaxEngineRPM = 9500.0f;
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->Reset();
 	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(0.0f, 400.0f);
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(1890.0f, 500.0f);
-	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(5730.0f, 400.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(2150.0f, 700.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(7000.0f, 600.0f);
+	Vehicle4W->EngineSetup.TorqueCurve.GetRichCurve()->AddKey(9530.0f, 400.0f);
 
 	// Adjust the steering
 	Vehicle4W->SteeringCurve.GetRichCurve()->Reset();
 	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(0.0f, 1.0f);
-	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(40.0f, 0.7f);
-	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(120.0f, 0.6f);
+	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(25.0f, 0.7f);
+	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(60.0f, 0.6f);
+	Vehicle4W->SteeringCurve.GetRichCurve()->AddKey(120.0f, 0.5f);
 
 	Vehicle4W->DifferentialSetup.DifferentialType = EVehicleDifferential4W::LimitedSlip_4W;
 	Vehicle4W->DifferentialSetup.FrontRearSplit = 0.65;
@@ -54,7 +56,8 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 	Camera->FieldOfView = 90.0f;
 
 	// Health
-	Health = 100.0f;
+	PlayerHealthMax = 100.0f;
+	PlayerHealth = PlayerHealthMax;
 }
 
 void AMyWheeledVehicle::Tick(float DeltaTime)
@@ -148,4 +151,9 @@ void AMyWheeledVehicle::UpdateInAirControl(float DeltaTime)
 			}
 		}
 	}
+}
+
+void AMyWheeledVehicle::IncrementHealth(float inc)
+{
+	PlayerHealth += inc;
 }
