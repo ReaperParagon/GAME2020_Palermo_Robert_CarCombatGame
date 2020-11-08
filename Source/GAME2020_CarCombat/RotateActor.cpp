@@ -2,6 +2,7 @@
 
 
 #include "RotateActor.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 ARotateActor::ARotateActor()
@@ -10,8 +11,14 @@ ARotateActor::ARotateActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Pitchvalue = Yawvalue = Rollvalue = 0.0f;
-	X = MinX = MaxX = Y = MinY = MaxY = Z = MinZ = MaxZ = 0.0f;
 
+	TargetDirection = FVector(0.0f, 0.0f, 0.0f);
+
+	MeshActor = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshActor"));
+	MeshActor->SetupAttachment(RootComponent);
+
+	BobAngle = 0.0f;
+	BobScale = 0.2f;
 }
 
 // Called when the game starts or when spawned
@@ -26,22 +33,19 @@ void ARotateActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Rotating the Actor's Mesh
 	FQuat QuatRotation = FQuat(FRotator(Pitchvalue, Yawvalue, Rollvalue));
-	
-	// AddActorLocalRotation(QuatRotation, false, 0, ETeleportType::None);
+	MeshActor->AddLocalRotation(QuatRotation, false, 0, ETeleportType::None);
 
-	if (X != 0.0f || Y != 0.0f || Z != 0.0f)
-	{
-		if (GetActorTransform().GetLocation().X > MaxX || GetActorTransform().GetLocation().X < MinX)
-			X *= -1.0f;
-		if (GetActorTransform().GetLocation().Y > MaxY || GetActorTransform().GetLocation().Y < MinY)
-			Y *= -1.0f;
-		if (GetActorTransform().GetLocation().Z > MaxZ || GetActorTransform().GetLocation().Z < MinZ)
-			Z *= -1.0f;
-	}
+	// Bobing up and down with a sin function
+	float Range = sin(BobAngle) * BobScale;
 
-	FTransform Transform = FTransform(QuatRotation, FVector(X, Y, Z), GetActorScale());
+	BobAngle += (DeltaTime);
+	if (BobAngle > 360.0f)
+		BobAngle -= 360.0f;
 
-	AddActorLocalTransform(Transform, false, 0, ETeleportType::None);
+	// Adding Translation
+	AddActorLocalOffset(TargetDirection * Range);
+	// AddActorLocalTransform(Transform, false, 0, ETeleportType::None);
 }
 

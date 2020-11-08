@@ -32,30 +32,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement");
 	float Rollvalue;
 
-	UPROPERTY(EditAnywhere, Category = "Movement");
-	float X;
-		
-	UPROPERTY(EditAnywhere, Category = "Movement");
-	float MinX;
+private:
 
-	UPROPERTY(EditAnywhere, Category = "Movement");
-	float MaxX;
+	/** Actor's Mesh */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret", meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* MeshActor;
 
-	UPROPERTY(EditAnywhere, Category = "Movement");
-	float Y;
+	/** Direction of Movement */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RotateActor", meta = (AllowPrivateAccess = "true"))
+	FVector TargetDirection;
 
-	UPROPERTY(EditAnywhere, Category = "Movement");
-	float MinY;
-
-	UPROPERTY(EditAnywhere, Category = "Movement");
-	float MaxY;
-
-	UPROPERTY(EditAnywhere, Category = "Movement");
-	float Z;
-
-	UPROPERTY(EditAnywhere, Category = "Movement");
-	float MinZ;
-
-	UPROPERTY(EditAnywhere, Category = "Movement");
-	float MaxZ;
+	float BobAngle;
+	float BobScale;
 };
