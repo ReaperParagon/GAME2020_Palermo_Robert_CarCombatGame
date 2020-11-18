@@ -6,15 +6,15 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
-#include "WheeledVehicleMovementComponent4W.h"
+#include "Components/StaticMeshComponent.h"
 
-static const FName NAME_SteeringInput("Steer");
-static const FName NAME_ThrottleInput("Throttle");
+// static const FName NAME_SteeringInput("Steer");
+// static const FName NAME_ThrottleInput("Throttle");
 
 AMyWheeledVehicle::AMyWheeledVehicle()
 {
-	UWheeledVehicleMovementComponent4W* Vehicle4W = CastChecked<UWheeledVehicleMovementComponent4W>(GetVehicleMovement());
-
+	// UWheeledVehicleMovementComponent4W* Vehicle4W = CastChecked<UWheeledVehicleMovementComponent4W>(GetVehicleMovement());
+	/* Wheeled Vehicle Stuff
 	// Adjust the tire load
 	Vehicle4W->MinNormalizedTireLoad = 0.0f;
 	Vehicle4W->MinNormalizedTireLoadFiltered = 0.2f;
@@ -43,6 +43,11 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 	Vehicle4W->TransmissionSetup.bUseGearAutoBox = true;
 	Vehicle4W->TransmissionSetup.GearSwitchTime = 0.15f;
 	Vehicle4W->TransmissionSetup.GearAutoBoxLatency = 1.0f;
+	*/
+
+	// Creating the Main Mesh for the Vehicle
+	MeshActor = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshActor"));
+	MeshActor->SetupAttachment(RootComponent);
 
 	// Create a spring arm component for our chase camera
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -58,11 +63,17 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 	// Health
 	PlayerHealthMax = 100.0f;
 	PlayerHealth = PlayerHealthMax;
+
+	// Defaults
+	TurretCount = 12;
+	TimeRemaining = 180.0f;
 }
 
 void AMyWheeledVehicle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	IncrementTimeRemaining(-DeltaTime);
 
 	UpdateInAirControl(DeltaTime);
 }
@@ -71,23 +82,23 @@ void AMyWheeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(NAME_ThrottleInput, this, &AMyWheeledVehicle::ApplyThrottle);
-	PlayerInputComponent->BindAxis(NAME_SteeringInput, this, &AMyWheeledVehicle::ApplySteering);
-	PlayerInputComponent->BindAxis("LookVertical", this, &AMyWheeledVehicle::LookVert);
-	PlayerInputComponent->BindAxis("LookHorizontal", this, &AMyWheeledVehicle::LookHoriz);
-
-	PlayerInputComponent->BindAction("Handbrake", IE_Pressed, this, &AMyWheeledVehicle::OnHandBrakePressed);
-	PlayerInputComponent->BindAction("Handbrake", IE_Released, this, &AMyWheeledVehicle::OnHandBrakeReleased);
+	// PlayerInputComponent->BindAxis(NAME_ThrottleInput, this, &AMyWheeledVehicle::ApplyThrottle);
+	// PlayerInputComponent->BindAxis(NAME_SteeringInput, this, &AMyWheeledVehicle::ApplySteering);
+	// PlayerInputComponent->BindAxis("LookVertical", this, &AMyWheeledVehicle::LookVert);
+	// PlayerInputComponent->BindAxis("LookHorizontal", this, &AMyWheeledVehicle::LookHoriz);
+	// 
+	// PlayerInputComponent->BindAction("Handbrake", IE_Pressed, this, &AMyWheeledVehicle::OnHandBrakePressed);
+	// PlayerInputComponent->BindAction("Handbrake", IE_Released, this, &AMyWheeledVehicle::OnHandBrakeReleased);
 }
 
 void AMyWheeledVehicle::ApplyThrottle(float val)
 {
-	GetVehicleMovementComponent()->SetThrottleInput(val);
+	// GetVehicleMovementComponent()->SetThrottleInput(val);
 }
 
 void AMyWheeledVehicle::ApplySteering(float val)
 {
-	GetVehicleMovementComponent()->SetSteeringInput(val);
+	// GetVehicleMovementComponent()->SetSteeringInput(val);
 }
 
 void AMyWheeledVehicle::LookVert(float val)
@@ -108,16 +119,17 @@ void AMyWheeledVehicle::LookHoriz(float val)
 
 void AMyWheeledVehicle::OnHandBrakePressed()
 {
-	GetVehicleMovementComponent()->SetHandbrakeInput(true);
+	// GetVehicleMovementComponent()->SetHandbrakeInput(true);
 }
 
 void AMyWheeledVehicle::OnHandBrakeReleased()
 {
-	GetVehicleMovementComponent()->SetHandbrakeInput(false);
+	// GetVehicleMovementComponent()->SetHandbrakeInput(false);
 }
 
 void AMyWheeledVehicle::UpdateInAirControl(float DeltaTime)
 {
+	/*
 	if (UWheeledVehicleMovementComponent4W* Vehicle4W = CastChecked<UWheeledVehicleMovementComponent4W>(GetVehicleMovement()))
 	{
 		FCollisionQueryParams QueryParams;
@@ -151,9 +163,45 @@ void AMyWheeledVehicle::UpdateInAirControl(float DeltaTime)
 			}
 		}
 	}
+	*/
 }
 
 void AMyWheeledVehicle::IncrementHealth(float inc)
 {
 	PlayerHealth += inc;
+}
+
+void AMyWheeledVehicle::IncrementTurretCount(int inc)
+{
+	TurretCount += inc;
+}
+
+void AMyWheeledVehicle::IncrementTimeRemaining(float inc)
+{
+	TimeRemaining += inc;
+}
+
+FString AMyWheeledVehicle::GetTimerString()
+{
+	int min, sec, mil;
+	FText M, S, Mi;
+	FString Minutes, Seconds, Milli;
+
+	FNumberFormattingOptions Format;
+	Format.MinimumIntegralDigits = 2;
+
+	min = (int)(TimeRemaining / 60.0f);
+	M = FText::AsNumber(min, &Format);
+	Minutes = M.ToString();
+
+	sec = (int)(TimeRemaining - (min * 60.0f));
+	S = FText::AsNumber(sec, &Format);
+	Seconds = S.ToString();
+
+	mil = (int)(((TimeRemaining * 60.0f) - (sec * 60.0f) - (min * 3600.0f)) * (100.0f / 60.0f));
+	Mi = FText::AsNumber(mil, &Format);
+	Milli = Mi.ToString();
+	
+	FString Timer = Minutes + ":" + Seconds + ":" + Milli;
+	return Timer;
 }
