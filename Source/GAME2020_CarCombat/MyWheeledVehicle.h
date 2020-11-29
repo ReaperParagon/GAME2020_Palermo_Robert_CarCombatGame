@@ -52,6 +52,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float TimeRemaining;
 
+	/** Throttle */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float ThrottlePower;
+
+	/** Turning Power */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float TurnPower;
+
 protected:
 
 	/** Spring arm that will offset the camera */
@@ -81,4 +89,20 @@ protected:
 	/** Get Timer as a String in Proper format */
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	FString GetTimerString();
+
+	/** Apply force */
+	void ApplyForce(float force, FVector start);
+
+	/** Check Collision for Line Trace */
+	uint8 CheckTraceCol(FVector start, FVector end);
+
+	/** Handle the wheels */
+	void HandleWheels();
+
+	/** Distance to Ground */
+	float TraceDist(FVector start, FVector end);
+
+	uint8 OnGround;
+	float ThrottleVal;
+	float SteerVal;
 };

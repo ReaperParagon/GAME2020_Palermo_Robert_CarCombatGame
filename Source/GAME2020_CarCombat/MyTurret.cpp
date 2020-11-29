@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
+#include "Math/UnrealMathUtility.h"
 
 // Sets default values
 AMyTurret::AMyTurret()
@@ -23,6 +24,7 @@ AMyTurret::AMyTurret()
 	RotationSpeed = 1.0f;
 	TargetDirection = FVector(0.0f, 0.0f, 0.0f);
 	ShootTime = 5.0f;
+	TurretHealth = 50.0f;
 }
 
 // Called when the game starts or when spawned
@@ -50,6 +52,12 @@ void AMyTurret::Tick(float DeltaTime)
 
 	MeshHead->AddLocalTransform(Transform, false, 0, ETeleportType::None);
 
-	TargetDirection = UGameplayStatics::GetPlayerPawn(this, 0)->GetActorLocation() - MeshHead->GetComponentLocation();
+	float acc = (UGameplayStatics::GetPlayerPawn(this, 0)->GetActorLocation() - MeshHead->GetComponentLocation()).Size() / 30.0f;
+	FVector random = FVector(FMath::RandRange(-acc, acc), FMath::RandRange(-acc, acc), FMath::RandRange(-acc, acc));
+	TargetDirection = (UGameplayStatics::GetPlayerPawn(this, 0)->GetActorLocation() - MeshHead->GetComponentLocation()) + random;
+}
 
+void AMyTurret::IncrementHealth(float inc)
+{
+	TurretHealth += inc;
 }

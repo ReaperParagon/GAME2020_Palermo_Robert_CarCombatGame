@@ -8,8 +8,8 @@
 #include "Components/InputComponent.h"
 #include "Components/StaticMeshComponent.h"
 
-// static const FName NAME_SteeringInput("Steer");
-// static const FName NAME_ThrottleInput("Throttle");
+static const FName NAME_SteeringInput("Steer");
+static const FName NAME_ThrottleInput("Throttle");
 
 AMyWheeledVehicle::AMyWheeledVehicle()
 {
@@ -47,11 +47,11 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 
 	// Creating the Main Mesh for the Vehicle
 	MeshActor = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshActor"));
-	MeshActor->SetupAttachment(RootComponent);
+	RootComponent = MeshActor;
 
 	// Create a spring arm component for our chase camera
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->SetupAttachment(MeshActor);
 	SpringArm->TargetArmLength = 250.0f;
 	SpringArm->bUsePawnControlRotation = true;
 
@@ -67,6 +67,12 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 	// Defaults
 	TurretCount = 12;
 	TimeRemaining = 180.0f;
+	OnGround = 0;
+
+	ThrottleVal = SteerVal = 0.0f;
+
+	ThrottlePower = 16000.0f;
+	TurnPower = 500.0f;
 }
 
 void AMyWheeledVehicle::Tick(float DeltaTime)
@@ -75,15 +81,23 @@ void AMyWheeledVehicle::Tick(float DeltaTime)
 
 	IncrementTimeRemaining(-DeltaTime);
 
-	UpdateInAirControl(DeltaTime);
+	HandleWheels();
+
+	if(ThrottleVal == 0)
+		MeshActor->SetPhysicsLinearVelocity(MeshActor->GetPhysicsLinearVelocity() * 0.99f);
+
+	if (SteerVal == 0)
+		MeshActor->SetPhysicsAngularVelocity(MeshActor->GetPhysicsAngularVelocity() * 0.99f);
+
+	// UpdateInAirControl(DeltaTime);
 }
 
 void AMyWheeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// PlayerInputComponent->BindAxis(NAME_ThrottleInput, this, &AMyWheeledVehicle::ApplyThrottle);
-	// PlayerInputComponent->BindAxis(NAME_SteeringInput, this, &AMyWheeledVehicle::ApplySteering);
+	PlayerInputComponent->BindAxis(NAME_ThrottleInput, this, &AMyWheeledVehicle::ApplyThrottle);
+	PlayerInputComponent->BindAxis(NAME_SteeringInput, this, &AMyWheeledVehicle::ApplySteering);
 	// PlayerInputComponent->BindAxis("LookVertical", this, &AMyWheeledVehicle::LookVert);
 	// PlayerInputComponent->BindAxis("LookHorizontal", this, &AMyWheeledVehicle::LookHoriz);
 	// 
@@ -93,19 +107,28 @@ void AMyWheeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AMyWheeledVehicle::ApplyThrottle(float val)
 {
-	// GetVehicleMovementComponent()->SetThrottleInput(val);
+	ThrottleVal = val;
+	if (OnGround != 0)
+	{
+		MeshActor->AddImpulse(((MeshActor->GetForwardVector() * ThrottlePower) - (MeshActor->GetUpVector() * 2000.0f)) * val);
+	}
 }
 
 void AMyWheeledVehicle::ApplySteering(float val)
 {
-	// GetVehicleMovementComponent()->SetSteeringInput(val);
+	if (OnGround != 0)
+	{
+		SteerVal = val;
+		MeshActor->AddTorqueInDegrees((MeshActor->GetUpVector() * TurnPower) * ThrottleVal * val, FName(NAME_None), true);
+		GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Red, FString::Printf(TEXT("Steering Value: %f"), (ThrottleVal * SteerVal)));
+	}
 }
 
 void AMyWheeledVehicle::LookVert(float val)
 {
 	if (val != 0.0f)
 	{
-		AddControllerPitchInput(val);
+		// AddControllerPitchInput(val);
 	}
 }
 
@@ -113,7 +136,7 @@ void AMyWheeledVehicle::LookHoriz(float val)
 {
 	if (val != 0.0f)
 	{
-		AddControllerYawInput(val);
+		// AddControllerYawInput(val);
 	}
 }
 
@@ -204,4 +227,68 @@ FString AMyWheeledVehicle::GetTimerString()
 	
 	FString Timer = Minutes + ":" + Seconds + ":" + Milli;
 	return Timer;
+}
+
+void AMyWheeledVehicle::ApplyForce(float force, FVector start)
+{
+	MeshActor->AddImpulseAtLocation(MeshActor->GetUpVector() * force, start);
+}
+
+uint8 AMyWheeledVehicle::CheckTraceCol(FVector start, FVector end)
+{
+	FHitResult OutHit;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(OutHit, start, end, ECC_Visibility, CollisionParams))
+	{
+		return OutHit.bBlockingHit;
+	}
+
+	return 0;
+}
+
+void AMyWheeledVehicle::HandleWheels()
+{
+	float dist = 90.0f;
+	float strength = 40.0f;
+
+	// Line Traces
+	FVector FR = MeshActor->GetSocketLocation(FName("Front_Right"));
+	FVector FL = MeshActor->GetSocketLocation(FName("Front_Left"));
+	FVector BR = MeshActor->GetSocketLocation(FName("Back_Right"));
+	FVector BL = MeshActor->GetSocketLocation(FName("Back_Left"));
+	FVector EndFR = ((-GetActorUpVector() * dist) + FR);
+	FVector EndFL = ((-GetActorUpVector() * dist) + FL);
+	FVector EndBR = ((-GetActorUpVector() * dist) + BR);
+	FVector EndBL = ((-GetActorUpVector() * dist) + BL);
+
+	OnGround = (
+		CheckTraceCol(FR, EndFR) +
+		CheckTraceCol(FL, EndFL) +
+		CheckTraceCol(BR, EndBR) +
+		CheckTraceCol(BL, EndBL));
+
+	if (CheckTraceCol(FR, EndFR) != 0)
+		ApplyForce(strength * (dist - TraceDist(FR, EndFR)), FR);
+	if (CheckTraceCol(FL, EndFL) != 0)
+		ApplyForce(strength * (dist - TraceDist(FL, EndFL)), FL);
+	if (CheckTraceCol(BR, EndBR) != 0)
+		ApplyForce(strength * (dist - TraceDist(BR, EndBR)), BR);
+	if (CheckTraceCol(BL, EndBL) != 0)
+		ApplyForce(strength * (dist - TraceDist(BL, EndBL)), BL);
+}
+
+float AMyWheeledVehicle::TraceDist(FVector start, FVector end)
+{
+	FHitResult OutHit;
+	FCollisionQueryParams CollisionParams;
+	CollisionParams.AddIgnoredActor(this);
+
+	if (GetWorld()->LineTraceSingleByChannel(OutHit, start, end, ECC_Visibility, CollisionParams))
+	{
+		return OutHit.Distance;
+	}
+
+	return 0.0f;
 }

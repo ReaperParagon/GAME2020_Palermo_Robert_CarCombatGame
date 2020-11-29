@@ -47,6 +47,14 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret", meta = (AllowPrivateAccess = "true"))
 	float ShootTime;
 
+	/** Turret Health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret", meta = (AllowPrivateAccess = "true"))
+	float TurretHealth;
+
+	/** Increment Health Value */
+	UFUNCTION(BlueprintCallable, Category = "Turret")
+	void IncrementHealth(float inc);
+
 	float BobAngle;
 	float BobScale;
 };
