@@ -60,6 +60,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float TurnPower;
 
+	/** Bullet Timer */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float BulletTimer;
+
 	/** Bullet Spawn Point */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	FVector BulletSpawn;
@@ -109,4 +113,5 @@ protected:
 	uint8 OnGround;
 	float ThrottleVal;
 	float SteerVal;
+	float TimerMax;
 };

@@ -73,6 +73,8 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 
 	ThrottlePower = 16000.0f;
 	TurnPower = 0.1f;
+	BulletTimer = 0;
+	TimerMax = 1.0f;
 
 	BulletSpawn = FVector(10.0f, 0.0f, 150.0f);
 }
@@ -84,6 +86,10 @@ void AMyWheeledVehicle::Tick(float DeltaTime)
 	IncrementTimeRemaining(-DeltaTime);
 
 	HandleWheels();
+
+	BulletTimer += DeltaTime;
+	if (BulletTimer > TimerMax)
+		BulletTimer = TimerMax;
 
 	// If No wheels are on the ground
 	if (OnGround == 0)
@@ -101,6 +107,9 @@ void AMyWheeledVehicle::Tick(float DeltaTime)
 			MeshActor->SetPhysicsAngularVelocity(MeshActor->GetPhysicsAngularVelocity() * 0.95f);
 	}
 	
+	// Positioning Bullet Spawn Point
+	BulletSpawn = 10.0f * MeshActor->GetForwardVector() + 150.0f * MeshActor->GetUpVector();
+
 	// UpdateInAirControl(DeltaTime);
 }
 
@@ -110,9 +119,9 @@ void AMyWheeledVehicle::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAxis(NAME_ThrottleInput, this, &AMyWheeledVehicle::ApplyThrottle);
 	PlayerInputComponent->BindAxis(NAME_SteeringInput, this, &AMyWheeledVehicle::ApplySteering);
-	// PlayerInputComponent->BindAxis("LookVertical", this, &AMyWheeledVehicle::LookVert);
-	// PlayerInputComponent->BindAxis("LookHorizontal", this, &AMyWheeledVehicle::LookHoriz);
-	// 
+	PlayerInputComponent->BindAxis("LookVertical", this, &AMyWheeledVehicle::LookVert);
+	PlayerInputComponent->BindAxis("LookHorizontal", this, &AMyWheeledVehicle::LookHoriz);
+	
 	// PlayerInputComponent->BindAction("Handbrake", IE_Pressed, this, &AMyWheeledVehicle::OnHandBrakePressed);
 	// PlayerInputComponent->BindAction("Handbrake", IE_Released, this, &AMyWheeledVehicle::OnHandBrakeReleased);
 }
@@ -141,7 +150,7 @@ void AMyWheeledVehicle::LookVert(float val)
 {
 	if (val != 0.0f)
 	{
-		// AddControllerPitchInput(val);
+		AddControllerPitchInput(val);
 	}
 }
 
@@ -149,7 +158,7 @@ void AMyWheeledVehicle::LookHoriz(float val)
 {
 	if (val != 0.0f)
 	{
-		// AddControllerYawInput(val);
+		AddControllerYawInput(val);
 	}
 }
 
