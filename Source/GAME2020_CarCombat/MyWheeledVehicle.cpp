@@ -72,7 +72,9 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 	ThrottleVal = SteerVal = 0.0f;
 
 	ThrottlePower = 16000.0f;
-	TurnPower = 500.0f;
+	TurnPower = 0.1f;
+
+	BulletSpawn = FVector(10.0f, 0.0f, 150.0f);
 }
 
 void AMyWheeledVehicle::Tick(float DeltaTime)
@@ -83,12 +85,22 @@ void AMyWheeledVehicle::Tick(float DeltaTime)
 
 	HandleWheels();
 
-	if(ThrottleVal == 0)
-		MeshActor->SetPhysicsLinearVelocity(MeshActor->GetPhysicsLinearVelocity() * 0.99f);
+	// If No wheels are on the ground
+	if (OnGround == 0)
+	{
+		MeshActor->SetLinearDamping(0.1f);
+	}
+	else
+	{
+		MeshActor->SetLinearDamping(1.5f);
 
-	if (SteerVal == 0)
-		MeshActor->SetPhysicsAngularVelocity(MeshActor->GetPhysicsAngularVelocity() * 0.99f);
+		if (ThrottleVal == 0)
+			MeshActor->SetPhysicsLinearVelocity(MeshActor->GetPhysicsLinearVelocity() * 0.95f);
 
+		if (SteerVal == 0)
+			MeshActor->SetPhysicsAngularVelocity(MeshActor->GetPhysicsAngularVelocity() * 0.95f);
+	}
+	
 	// UpdateInAirControl(DeltaTime);
 }
 
@@ -116,11 +128,12 @@ void AMyWheeledVehicle::ApplyThrottle(float val)
 
 void AMyWheeledVehicle::ApplySteering(float val)
 {
+	SteerVal = val;
 	if (OnGround != 0)
 	{
-		SteerVal = val;
-		MeshActor->AddTorqueInDegrees((MeshActor->GetUpVector() * TurnPower) * ThrottleVal * val, FName(NAME_None), true);
-		GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Red, FString::Printf(TEXT("Steering Value: %f"), (ThrottleVal * SteerVal)));
+		float TurningFactor = (TurnPower * (MeshActor->GetPhysicsLinearVelocity()).Size());
+		MeshActor->AddTorqueInDegrees((MeshActor->GetUpVector() * TurningFactor) * ThrottleVal * val, FName(NAME_None), true);
+		// GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Red, FString::Printf(TEXT("Steering Value: %f"), (ThrottleVal * SteerVal)));
 	}
 }
 

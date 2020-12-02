@@ -60,6 +60,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float TurnPower;
 
+	/** Bullet Spawn Point */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	FVector BulletSpawn;
+
 protected:
 
 	/** Spring arm that will offset the camera */
