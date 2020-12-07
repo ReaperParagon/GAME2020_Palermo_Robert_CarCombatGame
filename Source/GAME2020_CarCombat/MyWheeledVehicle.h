@@ -64,6 +64,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	float BulletTimer;
 
+	/** Bullet Timer Max */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	float TimerMax;
+
 	/** Bullet Spawn Point */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	FVector BulletSpawn;
@@ -98,6 +102,14 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	FString GetTimerString();
 
+	/** Get if the Player is defeated */
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	bool GetPlayerDefeated();
+
+	/** Get if the Player is victorious */
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	bool GetPlayerVictory();
+
 	/** Apply force */
 	void ApplyForce(float force, FVector start);
 
@@ -113,5 +125,4 @@ protected:
 	uint8 OnGround;
 	float ThrottleVal;
 	float SteerVal;
-	float TimerMax;
 };

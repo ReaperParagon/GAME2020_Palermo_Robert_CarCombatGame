@@ -82,8 +82,10 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 void AMyWheeledVehicle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	IncrementTimeRemaining(-DeltaTime);
+	if (!GetPlayerDefeated() && !GetPlayerVictory())
+	{
+		IncrementTimeRemaining(-DeltaTime);
+	}
 
 	HandleWheels();
 
@@ -214,6 +216,8 @@ void AMyWheeledVehicle::UpdateInAirControl(float DeltaTime)
 void AMyWheeledVehicle::IncrementHealth(float inc)
 {
 	PlayerHealth += inc;
+	if (PlayerHealth < 0)
+		PlayerHealth = 0;
 }
 
 void AMyWheeledVehicle::IncrementTurretCount(int inc)
@@ -249,6 +253,16 @@ FString AMyWheeledVehicle::GetTimerString()
 	
 	FString Timer = Minutes + ":" + Seconds + ":" + Milli;
 	return Timer;
+}
+
+bool AMyWheeledVehicle::GetPlayerDefeated()
+{
+	return (PlayerHealth <= 0.0f || TimeRemaining <= 0.0f);
+}
+
+bool AMyWheeledVehicle::GetPlayerVictory()
+{
+	return (TurretCount <= 0);
 }
 
 void AMyWheeledVehicle::ApplyForce(float force, FVector start)
