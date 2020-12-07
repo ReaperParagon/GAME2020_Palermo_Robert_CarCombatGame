@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Components/AudioComponent.h"
 #include "MyWheeledVehicle.generated.h"
 
 /**
@@ -86,6 +87,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* MeshActor;
 
+	/** Actor's Mesh */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	class USoundCue* SoundEngine;
+
 	/** Increment Health Value */
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void IncrementHealth(float inc);
@@ -121,6 +126,8 @@ protected:
 
 	/** Distance to Ground */
 	float TraceDist(FVector start, FVector end);
+
+	UAudioComponent* EngineAudioComponent;
 
 	uint8 OnGround;
 	float ThrottleVal;
