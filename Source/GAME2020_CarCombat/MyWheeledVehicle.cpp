@@ -61,14 +61,14 @@ AMyWheeledVehicle::AMyWheeledVehicle()
 	Camera->FieldOfView = 90.0f;
 
 	// Sounds
-	static ConstructorHelpers::FObjectFinder<USoundCue> SoundEngineCue(TEXT("SoundCue'/Game/Sounds/Car_Engine_Cue.Car_Engine_Cue'"));
+	/*static ConstructorHelpers::FObjectFinder<USoundCue> SoundEngineCue(TEXT("SoundCue'/Game/Sounds/Car_Engine_Cue.Car_Engine_Cue'"));
 	if (SoundEngineCue.Succeeded())
 	{
 		SoundEngine = SoundEngineCue.Object;
 
 		EngineAudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("EngineAudioComponent"));
 		EngineAudioComponent->SetupAttachment(MeshActor);
-	}
+	}*/
 
 	// Health
 	PlayerHealthMax = 100.0f;

@@ -45,7 +45,8 @@ void ARotateActor::Tick(float DeltaTime)
 		BobAngle -= 360.0f;
 
 	// Adding Translation
-	AddActorLocalOffset(TargetDirection * Range);
+	AddActorWorldOffset(TargetDirection * Range);
+	// AddActorLocalOffset(TargetDirection * Range);
 	// AddActorLocalTransform(Transform, false, 0, ETeleportType::None);
 }
 
